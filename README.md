@@ -233,7 +233,7 @@ Here are the jQuery references for the above activities:
 
 Based on the above references as well as your own research, try to complete one or two of the following activities:
 
-### Suggesting a title when someone adds new content
+### Suggesting a title before someone adds new content (browser-side only)
 Here we are basically going to reproduce the following functionality:
 
 ![](http://g.recordit.co/x9OS40EY9n.gif)
@@ -243,6 +243,8 @@ Here we are basically going to reproduce the following functionality:
 3. When we receive the HTML for the page, we want to parse it again using jQuery
 4. Using jQuery's DOM functions, find the `title` element and put its content in the title field
 5. Optionally show a "loading" text while your are doing the work
+
+**NOTE**: The user stays on the same page while this is going on. Everything happens without refreshing the page.
 
 ### Voting without refreshing the page!
 When a user clicks on the submit button of either of the two voting forms, the following happens:
