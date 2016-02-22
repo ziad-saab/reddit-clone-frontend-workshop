@@ -179,9 +179,10 @@ Use the `Layout` component to add a **navigation menu** to all your pages, using
 
 ---
 
-## CSS3, Flexbox
+## CSS3, Flexbox and styling forms
 Learn more about CSS3 and flexbox using the following resources, and any other you can find:
 
+### Flexbox: layouts the easy way
 * http://flexbox.io/#/
 * http://flexboxin5.com/
 * http://flexboxfroggy.com/
@@ -200,5 +201,14 @@ The bottom of the right side container should have the "created by" on the left,
 
 **HINT**: Remember, the goal here is to use as much of flexbox as possible. You shouldn't need to float things to the left or right, or any vertical alignment.
 
-## jQuery
+### Styling forms
+Our Reddit clone, however tiny it may be already contains three FORMS! After reading [this MDN article about styling forms](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Forms/Styling_HTML_forms), use some CSS to make your forms look nice.
+
+Try to implement an overall look for your forms and use some CSS classes to style them as you wish.
+
+### More...
+You can come back to this section and keep adding CSS to your page as we discover more together in class.
+
+## Adding interactivity with JavaScript and jQuery
+At the moment our Reddit clone is a little bit less user-friendly than it could be. For one thing, voting on content is
 https://learn.jquery.com/ajax/
