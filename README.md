@@ -173,6 +173,8 @@ function renderLogin(data) {
 }
 ```
 
+Notice the part that says `{data.children}` inside the `Layout` component? It will be replaced with everything inside the `<Layout>...</Layout>` above :)
+
 See if you can refactor every page to use the layout. When that is done, go back to the beginning of the exercise and try to output your structure using HTML semantic tags!
 
 Use the `Layout` component to add a **navigation menu** to all your pages, using the `<nav>` component. As this is an open-ended exercise, see in what other places you can use HTML semantic elements like article, main, aside or section.
@@ -210,5 +212,59 @@ Try to implement an overall look for your forms and use some CSS classes to styl
 You can come back to this section and keep adding CSS to your page as we discover more together in class.
 
 ## Adding interactivity with JavaScript and jQuery
-At the moment our Reddit clone is a little bit less user-friendly than it could be. For one thing, voting on content is
-https://learn.jquery.com/ajax/
+At the moment our Reddit clone is a little bit less user-friendly than it could be. For one thing, voting on content is refreshing the page every time. Another thing we may want to do is suggest a title for a user as they're adding a new URL, to make it easier.
+
+As you know, any interactivity happening in your browser will be mostly due to JavaScript. So far, we've been writing JavaScript for quite a few weeks, but never actually used it in the browser. It turns out that the browser offers us a lot of APIs for doing interactive things **once a webpage has already loaded**. Some of these things include:
+
+* Manipulating the content of the current document using [the DOM](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model)
+* [Listening for various events like clicking, hovering, typing](https://developer.mozilla.org/en-US/docs/Web/Events)
+* [Making HTTP requests directly from the browser](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest)
+
+If you read the above documents, you may get a feeling that these APIs provided by the browser are quite low-level. They're not super straight forward and some pitfalls exist.
+
+You may have heard of [jQuery](http://jquery.com/) as the go-to library for adding interactivity on your page. jQuery is no more than JavaScript code that packages some nice functions for doing the things we mentioned above. As it turns out, some of these things are much easier to do with jQuery, which explains why it has become so popular.
+
+Here are the jQuery references for the above activities:
+
+* [Manipulating the contents of a page with jQuery](https://learn.jquery.com/using-jquery-core/)
+* [Listening for events like clicking, typing, etc. on a page](https://learn.jquery.com/events/)
+* [Making HTTP requests directly from the browser with jQuery](https://learn.jquery.com/ajax/)
+* [Try jQuery!](http://try.jquery.com/)
+
+Based on the above references as well as your own research, try to complete one or two of the following activities:
+
+### Suggesting a title when someone adds new content
+Here we are basically going to reproduce the following functionality:
+
+![](http://g.recordit.co/x9OS40EY9n.gif)
+
+1. Next to the URL field, let's add a button that says "suggest title".
+2. **On click** of this button, we want to make an **ajax request** for the URL
+3. When we receive the HTML for the page, we want to parse it again using jQuery
+4. Using jQuery's DOM functions, find the `title` element and put its content in the title field
+5. Optionally show a "loading" text while your are doing the work
+
+### Voting without refreshing the page!
+When a user clicks on the submit button of either of the two voting forms, the following happens:
+
+1. The browser takes the form data and makes a query string out of it: `voteDirection=1&contentId=123`
+2. The browser looks at the form's `action` and `method` and makes an HTTP request accordingly
+3. The server receives the (POST) request and form data, and does what it needs to do
+4. The server sends a **redirect response** back to the homepage
+5. The browser receives the redirect, and does another HTTP GET to the homepage
+
+While this experience follows the **statelessness** principle of HTTP, it's not super friendly for our users. For one thing, there is a flash of content as the page refreshes. Moreover, the server is indiscriminately redirecting to the homepage, but we may have been on another page that displays posts. Not only that, but we may have been scrolled to the bottom of the page and now we are back to the top.
+
+For all these reasons, it may be nicer for our users if we could take such a small interaction as voting and make it happen **without refreshing the page**. Even though we're staying on the same page, we still have to follow the rules of HTTP. Among other things, it means that *our browser will still have to send an HTTP POST request to make the vote happen*. The difference is, this request will be done by the JavaScript code running in the browser. This is AJAX :)
+
+Here are the high level steps we will be following...
+
+When a user submits either of the two voting forms:
+
+1. Our code should **listen to this submit event** and prevent the submit from taking place
+2. Our code should **find the two hidden inputs** inside the form, and [find out their value](https://api.jquery.com/val/)
+3. Our code should **do an ajax POST request** to our `/vote` URL, passing it the parameters `voteDirection` and `contentId`
+4. At this point, our server will receive the POST and do its usual business of creating the vote
+5. For now, our server is sending a redirect response, which our AJAX code may not have much use for
+
+In the server-side version, our POST handler was redirecting us back to the homepage, the browser was requesting the home page again, and the new votes count would display itself. In this browser-only version, what could we do? We made the POST request, but the vote count stays the same... How could we fix this?
