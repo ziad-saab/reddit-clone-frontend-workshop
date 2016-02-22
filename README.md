@@ -188,7 +188,17 @@ Learn more about CSS3 and flexbox using the following resources, and any other y
 
 Using your newly-acquired knowledge on flexbox, as well as anything else you found out about CSS, refactor the homepage's list of posts to look like the following:
 
+![](https://i.imgur.com/erVHYGq.png)
 
+Each post item in the list should be organized as a flexbox container.
+
+The left side should take only as much space as it needs to output the up/down vote arrows and the vote score. **If you don't have vote scores in your app, replace it with a random number for the moment**.
+
+The right side should expand to take all remaining space. Inside should be the title, and below that, yet another container.
+
+The bottom of the right side container should have the "created by" on the left, and "created at" all the way to the right.
+
+**HINT**: Remember, the goal here is to use as much of flexbox as possible. You shouldn't need to float things to the left or right, or any vertical alignment.
 
 ## jQuery
 https://learn.jquery.com/ajax/
