@@ -193,6 +193,10 @@ Using your newly-acquired knowledge on flexbox, as well as anything else you fou
 
 ![](https://i.imgur.com/erVHYGq.png)
 
+**STOP**: How are you going to load a CSS file from your HTML page? If you add a `<link>` tag with `href="/css/app.css"`, will it work? Does your web server have a handler for GET requests to `/css/app.css`? It doesn't, but it doesn't need to! [ExpressJS has a middleware for serving so-called "static files"](http://expressjs.com/en/starter/static-files.html). Read up on it and implement it in your server before going forward.
+
+Once it's setup, create a static file at `css/app.css` in your `static` directory to complete this exercise.
+
 Each post item in the list should be organized as a flexbox container.
 
 The left side should take only as much space as it needs to output the up/down vote arrows and the vote score. **If you don't have vote scores in your app, replace it with a random number for the moment**.
