@@ -265,6 +265,26 @@ When a user submits either of the two voting forms:
 2. Our code should **find the two hidden inputs** inside the form, and [find out their value](https://api.jquery.com/val/)
 3. Our code should **do an ajax POST request** to our `/vote` URL, passing it the parameters `voteDirection` and `contentId`
 4. At this point, our server will receive the POST and do its usual business of creating the vote
-5. For now, our server is sending a redirect response, which our AJAX code may not have much use for
+5. For now, our server is sending a redirect response, which our AJAX code may not have much use for...
 
 In the server-side version, our POST handler was redirecting us back to the homepage, the browser was requesting the home page again, and the new votes count would display itself. In this browser-only version, what could we do? We made the POST request, but the vote count stays the same... How could we fix this?
+
+If only we could get the new vote count as the result of our POST request... Well why not? We're the ones who wrote the web server, so we can make it do whatever we want! Let's modify our Reddit server's POST handler to `/vote`. Instead of sending a redirect response to the client, let's find out the new vote score for the content that was voted on, and return it to the user as JSON. Instead of:
+
+1. Check if the user is logged in
+2. Create a vote or update existing vote
+3. Send a `response.redirect` response to `/` homepage
+
+Let's do the following:
+
+1. Check if the user is logged in (this stays the same)
+2. Create a vote or update existing vote (this stays the same)
+3. Make a new Sequelize query for the Content with its vote score
+4. Send a `response.json` with an object `{newVoteScore: XX}` where `XX` is the new vote score
+
+Then, on the browser side, in the response to our AJAX query, we will receive this JSON. Let's do the following:
+
+1. Receive the JSON response from doing the POST to `/vote` by AJAX
+2. Parse the JSON response to an object using `JSON.parse`
+3. Retrieve the `newVoteScore` property of the object
+4. Update the user interface to represent the new vote score using jQuery's DOM functions
