@@ -159,7 +159,7 @@ function renderLogin(data) {
     <Layout title="Login!">
       <h1>Login</h1>
       <form action="/login" method="post">
-        {data.error && <div>{data.error}</div>}
+        {data.error ? <div>{data.error}</div> : null}
         <input type="text" name="username"/>
         .....
       </form>
