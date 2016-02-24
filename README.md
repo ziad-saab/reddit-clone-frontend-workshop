@@ -252,6 +252,35 @@ Here we are basically going to reproduce the following functionality:
 
 **NOTE 2**: What happens when you try to make an AJAX request to an external site? It seems like the browser is blocking you. How could you go around this?
 
+You are probably getting an error that looks like this:
+
+`XMLHttpRequest cannot load http://www.domain.com/some-url/ Origin null is not allowed by Access-Control-Allow-Origin.`
+
+Here, you are being blocked by the [same origin policy](https://en.wikipedia.org/wiki/Same-origin_policy). Your browser is preventing the JavaScript on your domain to make AJAX calls to another domain because that could be destructive if not controlled.
+
+For example, imagine if you land on my website, and some JavaScript code makes an AJAX request to your bank's website. If that were let through, my JavaScript could retrieve your bank account numbers and balances and send them over to me over the network.
+
+Since we won't be able to do external request to every website in the world from our own domain, the best way around that will be to make the requests **from our own web server**. Here's how it will work:
+
+Let's say you want to find out the title of the page at https://www.decodemtl.com/web-development-full-time/. If you make an AJAX request to this URL your browser will block you. Instead, make an AJAX call to your own web server, at the resource called, say, `/suggestTitle` and pass it the URL in a query string: `/suggestTitle?url=https://www.decodemtl.com/web-development-full-time/`.
+
+On your server, implement an `app.get('/suggestTitle')` that will use the `request.query.url`, make a request to that web page, and retrieve the HTML code of the page.
+
+Then, you'll need to parse the HTML on the server side to find the content of the `<title>` tag. Wouldn't it be nice if you had jQuery on the server? Well, you do! The [cheerio NPM package](https://cheeriojs.github.io/cheerio/) does specifically that :)
+
+So the process will work like this:
+
+1. User enters a URL in the title field
+2. User clicks on the "suggest title" button
+3. Your code does an AJAX query to `/suggestTitle?url=...`
+4. Your server receives this request, and retrieves the `url` from the query string parameters
+5. Your server does a web request (e.g. using the `request` NPM package) to the submitted URL
+6. Your server receives the HTML for the web page and passes it to the `cheerio` library
+7. `cheerio` returns the `<title>` of the page
+8. Your server sends a `response.json` with the title, like `{"title": "web development in montreal"}`
+9. Your browser code receives the response from the server
+10. Your browser code updates the Title field with the text of the response
+
 ### Voting without refreshing the page!
 When a user clicks on the submit button of either of the two voting forms, the following happens:
 
