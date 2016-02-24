@@ -250,6 +250,8 @@ Here we are basically going to reproduce the following functionality:
 
 **NOTE**: The user stays on the same page while this is going on. Everything happens without refreshing the page.
 
+**NOTE 2**: What happens when you try to make an AJAX request to an external site? It seems like the browser is blocking you. How could you go around this?
+
 ### Voting without refreshing the page!
 When a user clicks on the submit button of either of the two voting forms, the following happens:
 
