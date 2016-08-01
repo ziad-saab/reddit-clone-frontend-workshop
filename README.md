@@ -58,7 +58,7 @@ First, [make sure you started using EJS](https://scotch.io/tutorials/use-ejs-to-
 Once you have EJS up and running, check out [`ejs-mate`](https://github.com/JacksonTian/ejs-mate) to add a common layout to your site.
 
 ### Work
-Using your newly acquired knowledge, as well as your `renderLayout` function, modify the HTML structure of your Reddit clone to take advantage of semantic HTML5 elements. Among other things, you can make use of `<nav>`, `<article>`, `<main>` and `<aside>`.
+Using your newly acquired knowledge, as well as your `ejs-mate` functionality, modify the HTML structure of your Reddit clone to take advantage of semantic HTML5 elements. Among other things, you can make use of `<nav>`, `<article>`, `<main>` and `<aside>`.
 
 At the very least, your page should have a constant header and footer, and a main section with all the content of that page.
 
