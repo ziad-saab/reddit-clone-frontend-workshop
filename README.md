@@ -53,16 +53,9 @@ Perhaps you want all your pages to look like this:
 </html>
 ```
 
-What you should do is create a **simple function** called renderLayout. It should take the variable content that you have as parameters, and return the full page with the variable part in between. For example:
+First, [make sure you started using EJS](https://scotch.io/tutorials/use-ejs-to-template-your-node-application) by following this guide or many others.
 
-```javascript
-function renderLayout(pageTitle, isLoggedIn, content) {
-  var html = "<!doctype><html><head>...<title>" + pageTitle + "</title>....</head>";
-  html = html + "<body><nav>... isLoggedIn ? some buttons : different buttons</nav>...<main>" + mainContent + "</main> <footer>...</footer> </html>";
-}
-```
-
-This way, all your pages can use that function to pass it the variable part of HTML, and it will return a single block of HTML that you can output as the full page.
+Once you have EJS up and running, check out [`ejs-mate`](https://github.com/JacksonTian/ejs-mate) to add a common layout to your site.
 
 ### Work
 Using your newly acquired knowledge, as well as your `renderLayout` function, modify the HTML structure of your Reddit clone to take advantage of semantic HTML5 elements. Among other things, you can make use of `<nav>`, `<article>`, `<main>` and `<aside>`.
