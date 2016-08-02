@@ -199,12 +199,10 @@ Let's do the following:
 
 1. Check if the user is logged in (this stays the same)
 2. Create a vote or update existing vote (this stays the same)
-3. Make a new Sequelize query for the Content with its vote score
-4. Send a `response.json` with an object `{newVoteScore: XX}` where `XX` is the new vote score
+4. Send a `response.json` with an object `{ok: true}` if everything went well
 
 Then, on the browser side, in the response to our AJAX query, we will receive this JSON. Let's do the following:
 
 1. Receive the JSON response from doing the POST to `/vote` by AJAX
 2. Parse the JSON response to an object using `JSON.parse`
-3. Retrieve the `newVoteScore` property of the object
-4. Update the user interface to represent the new vote score using jQuery's DOM functions
+3. If the `ok` property is set to true, add 1 to the current vote score for this post using jQuery's DOM functions
