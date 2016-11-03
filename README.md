@@ -178,3 +178,102 @@ Then, implement a `GET /suggest` endpoint on your reddit server. It should do th
 After that, you should simply have to call the `autocomplete` plugin on your subreddit text input field, and pass it the appropriate parameters. Look at the [usage section of the jQuery-Autocomplete documentation](https://github.com/devbridge/jQuery-Autocomplete#usage)
 
 When the user selects a subreddit, you can set the subreddit ID as an [`<input type="hidden">`](http://www.echoecho.com/htmlforms07.htm) field inside the `<form>` from your `onSelect` callback. This way, when the form is submitted by the browser, it will have the subreddit ID in the POST data.
+
+---
+
+## Putting your Reddit Clone "online"
+It's time to host your Reddit Clone online using a real production environment. Even though Cloud9 provides you a public URL for testing your site, it's not meant to be used by the public. For one thing, the Cloud9 virtual machine is super slow and won't be able to accept a large number of requests. But more importantly, Cloud9 will sleep your virtual machine if you don't touch it for a few days, which would bring your site offline.
+
+In this section, we're going to publish your Reddit Clone on the [Heroku platform](https://www.heroku.com/). In short, Heroku is a service to which you can upload your NodeJS code. They will run your code on their servers just like Cloud9 does, but more automated. You can upload your code to Heroku by doing a simple `git push`.
+
+Of course there's a bit more to it than that. For one thing, our Reddit Clone needs a MySQL database. So far, we got away with running a development database server on the same Cloud9 VM as our web server. In production, we'll need to use a production-ready MySQL database. Thankfully, Heroku has got us covered with not one but two MySQL database hosting providers, and they both provide a "free for development" option. Heroku itself is free for development, so you won't have to pay anything to get started :)
+
+Here are the steps you'll need to follow:
+
+1. Create a Heroku account. That's the easy part.
+2. Login to Heroku and [create a new application](https://dashboard.heroku.com/new?org=personal-apps)
+3. On your app's dashboard, click on the Resources link at the top
+4. On the Resources page, scroll down to Addons and search for mysql
+5. Choose the ClearDB MySQL and select the "Ignite - Free" option
+6. Install the Heroku Command Line client. If you are on Cloud9, follow the [Debian/Ubuntu instructions](https://devcenter.heroku.com/articles/heroku-command-line#debian-ubuntu). On a Mac follow the [OSX instructions](https://devcenter.heroku.com/articles/heroku-command-line#os-x)
+7. From your command line, run `heroku login` and follow the prompts. You only have to do this once.
+8. From your command line, go in the directory of your project and make sure everything is commited. If you've been using branches, make sure any completed work has been merged to master. Make sure that you are on the master branch
+9. Run `heroku git:remote -a NAME_OF_YOUR_HEROKU_APP`
+10. Run `git push heroku master`
+
+That's it! You've successfully pushed code on Heroku! Will it work? Not immediately. There's still a lot for us to do. However, we have everything setup to succeed. From now on, whenever we make changes to our code that we need to push on Heroku, we can simply run `git push heroku master`. This will push our code on Heroku, and Heroku will automatically install NPM packages then execute our server.
+
+At this point there are still two major things to resolve. First, Heroku doesn't know what `.js` file to execute to run our server. Second, our code is connecting to a MySQL database at `localhost`. This will not work on Heroku.
+
+### Telling Heroku what code to run
+Let's say that you normally execute `node server.js` to run your web server. To tell this to Heroku, you have to create a file at the root of your project and call it `Procfile`, without any extension. In this file, write the following:
+
+```
+web: node server.js
+```
+
+If your command is different, make sure to change it. If you're running your code with `nodemon`, change it to `node` for Heroku. That's it for this step. If you push your changes to Heroku now, it will try to run your server. This will fail, because your server won't be able to connect to its MySQL database.
+
+### Modifying the server code to use the right database
+Remember our friend `process.env`? We can use it to access so-called environment variables. On Cloud9, we are provided with a `PORT` environment variable that we use to make our server listen on the port that Cloud9 wants us to listen on. Well, Heroku has the same `PORT` env var, so our `server.listen(process.env.PORT)` line works both on Cloud9 and Heroku.
+
+It turns out that when you added the ClearDB database to your app, Heroku automatically added an environment variable called `CLEARDB_DATABASE_URL` to your Heroku environment. Of course, this environment variable is not present on Cloud9 nor on your local machine. You can see the value of this environment variable by running the following command from your project directory:
+
+```
+heroku config 
+```
+
+We will use this to our advantage to modify the `mysql.createConnection` call we are making in our server. It turns out that `createConnection` can accept both an object of options and a URL. Instead of doing:
+
+```js
+var conn = mysql.createConnection({
+// ...options
+});
+```
+
+let's do this:
+
+```js
+var conn;
+if (process.env.CLEARDB_DATABASE_URL) {
+  conn = mysql.createConnection(process.env.CLEARDB_DATABASE_URL);
+}
+else {
+  conn = mysql.createConnection(/*same as before for local env*/);
+}
+```
+
+With this simple code change, the same server code will work both on Cloud9 AND on Heroku. This is why environment variables are so powerful. They are set by the system, and can affect our running code at any level.
+
+Great! Now our server can connect to the proper MySQL database, but there' still one issue: our ClearDB-hosted MySQL server does not have any tables in it! To fix this, we'll need to run some `CREATE TABLES` on that server. Thankfully we can do this by using the command-line MySQL client. But rather than calling it only with the `-u` option, we'll need to provide it two more options: a password and a database name. All this information is included in the `CLEARDB_DATABASE_URL` variable. This URL is of the form:
+
+```
+mysql://USERNAME:PASSWORD@HOST/DATABASENAME
+```
+
+Find out your connection information by retrieving the URL from your Heroku app, then run the following command line:
+
+```
+mysql -uUSERNAME -p -hHOST --database DATABASENAME
+```
+
+replacing each value by the one found in the URL. When you press ENTER, you'll be prompted for the password. This is to make sure that your password doesn't make it to the history of your command line, which could pose a security risk.
+
+If successful, you'll be greeted with the MySQL prompt you are familiar with. Don't be mistaken however, you *are* connected to a remote server! If you do a `SHOW TABLES`, it should be empty.
+
+Bring your database to a usable state by running any `CREATE TABLE`s and `ALTER TABLE`s that you need. At this point you should be able to run your Reddit Clone! Go to your `herokuapp.com` URL and see if you can signup.
+
+Still, many things can go wrong. Most probably you'll be getting an "Application Error" page from Heroku. This means your server has crashed for one reason or another. If you do get that, then go to your command line and run the following command:
+
+```
+heroku logs --tail
+```
+
+This will output the `console.log`s that your server is doing on Heroku. You can stop this command with `Ctrl+C`, but don't stop it now. Read the logs, and see if you can figure out what's wrong. Here are a few things that could have gone wrong:
+
+1. Your server is using an NPM module that you installed without `--save`. Since Heroku reads your `package.json` to install the modules, it won't have installed it. So your server will be working locally, but not on Heroku. Fix this by re-installing the package with `--save`, commit and push to Heroku. Then check the logs again to see what's up
+2. You made a typo in `process.env.CLEARDB_DATABASE_URL`. Fix it!
+3. You did not add all the proper tables/fields to the production database. If this happens, you'll see some MySQL errors in your logs. Fix them!
+4. Anything. Getting your app to load and work correctly on a remote environment is not easy. Many things can go wrong. If you look at the logs carefully, you should be able to figure out what's happening, and fix it as if it was happening on your local machine. You can do it!
+
+As a final step, test all the functionalities of your production Reddit Clone. Make sure you can signup, login, create posts, upvote, downvote, create multiple accounts, etc. Everything should work exactly as on your local. Congratulations, you now have an online Reddit Clone that you can show to your classmates, friends and potential employers :)
